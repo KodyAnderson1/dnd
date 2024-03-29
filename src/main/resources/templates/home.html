@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>D&D Character Manager</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet" />
+  </head>
+  <body class="dark min-h-screen bg-gray-900 text-gray-200">
+    <header th:replace="~{fragments/header :: header}"></header>
+
+    <main class="p-4">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold mb-4 flex items-center">Your Characters</h2>
+
+        <a
+          th:href="@{/characters/new}"
+          class="inline-flex items-center justify-center rounded-md cursor-pointer bg-blue-700 hover:bg-blue-600">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 m-2 flex justify-center items-center"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div th:each="character : ${characters}">
+          <div
+            th:replace="~{fragments/character-card :: character-card(character=${character})}"></div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

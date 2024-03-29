@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>D&D Session Cards</title>
+    <!-- Tailwind CSS inclusion (if not globally included in your project) -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- D&D Session Card Fragment with Tailwind CSS -->
+<th:block th:fragment="dndSessionCard (DnDSession)">
+
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm" data-v0-t="card">
+        <div class="p-6 flex flex-col gap-2">
+            <h2 class="text-xl font-bold" th:text="${DnDSession.name}">The Dragon's Lair</h2>
+            <p class="text-gray-500 text-base" th:text="${DnDSession.description}">Session description...</p>
+            <span class="inline-block mr-2 mb-2" th:text="'Active Participants: ' + ${DnDSession.getParticipantCount()}">Active Participants: 0</span>
+            <a class="flex w-full items-center justify-center bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" th:href="@{'/sessions/' + ${DnDSession.sessionId}}" rel="ugc">
+                Join
+            </a>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

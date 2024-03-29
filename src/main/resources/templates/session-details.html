@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>The Dragon's Den</title>
+    <!-- Tailwind CSS inclusion -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body th:fragment="layout(content)">
+<div class="dark min-h-screen bg-gray-800 text-gray-200">
+    <header th:replace="~{fragments/header :: header}"></header>
+    <main class="p-4">
+        <h1 class="text-xl font-bold mb-4" th:text="${dndSession.name}">Session Details</h1>
+        <div class="flex">
+            <section th:replace="~{fragments/chatMessages :: chatMessages(${dndSession.getChatSession().getMessages()}, ${dndSession.sessionId}, ${username})}"></section>
+            <aside th:replace="~{fragments/participants :: participants(${participants}, ${dndSession})}"></aside>
+        </div>
+    </main>
+</div>
+</body>
+</html>

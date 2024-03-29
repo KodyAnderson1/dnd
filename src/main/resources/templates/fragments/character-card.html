@@ -1,0 +1,24 @@
+<div th:fragment="character-card(character)" class="dark">
+    <div class="border text-card-foreground max-w-md mx-auto bg-gray-800 rounded-xl shadow-md overflow-hidden dark:bg-gray-900">
+        <div class="md:flex">
+            <div class="pt-8 px-8">
+                <h3 class=" font-medium text-white" th:text="${character.name}">
+                    Character Name
+                </h3>
+                <p class="text-sm mt-2 text-gray-400">
+                    Race: <span th:text="${character.race}">Elf</span> <br>
+                    Class: <span th:text="${character.characterClass}">Ranger</span> <br>
+                    Level: <span th:text="${character.level}">5</span>
+                </p>
+            </div>
+        </div>
+        <div class="mt-6 flex w-full gap-2 px-8 pb-4 items-center justify-center">
+            <a th:href="@{/characters/{id}/edit(id=${character.id})}" class="flex w-full items-center justify-center bg-transparent hover:bg-gray-200 text-gray-200 font-semibold hover:text-black py-2 px-4 border border-gray-200 hover:border-transparent rounded">
+                Edit
+            </a>
+            <a th:href="@{/characters/{id}(id=${character.id})}" class="flex w-full items-center justify-center bg-transparent hover:bg-blue-400 text-blue-600 font-semibold hover:text-white py-2 px-4 border border-blue-400 hover:border-transparent rounded">
+                Details
+            </a>
+        </div>
+    </div>
+</div>

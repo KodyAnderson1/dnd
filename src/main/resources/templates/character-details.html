@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D Character Manager - Character Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="dark min-h-screen bg-gray-800 text-gray-200">
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main class="p-6">
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm grid gap-6" data-v0-t="card">
+        <div class="flex-col space-y-1.5 p-6 flex items-center justify-between relative">
+            <img th:src="@{https://placehold.co/600x400}" width="75" height="75" class="rounded-full mx-auto" alt="Character Avatar" style="aspect-ratio: 1; object-fit: cover;">
+            <div class="text-center mt-4">
+                <h3 class="font-semibold whitespace-nowrap tracking-tight text-2xl" th:text="${character.name}">Aragorn</h3>
+                <p class="text-sm text-gray-400" th:text="'Level ' + ${character.level} + ' ' + ${character.characterClass}">
+                    Level 20 Ranger
+                </p>
+            </div>
+            <a class="text-blue-400 hover:text-blue-300 absolute top-6 right-6" th:href="@{/characters/{id}/edit(id=${character.id})}">
+                Update Character
+            </a>
+        </div>
+
+        <div class="p-6">
+            <div class="grid gap-4 md:grid-cols-2">
+                <div>
+                    <h3 class="text-lg font-semibold">Attributes</h3>
+                    <ul class="grid gap-2 mt-2">
+                        <li class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 inline-block mr-2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
+                            </svg>
+                            <p th:text="${character.getRace()}">
+                                Level 20 Ranger
+                            </p>
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 inline-block mr-2">
+                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+                            </svg>
+                            Attribute 2
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 inline-block mr-2">
+                                <path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"></path>
+                                <path d="m13 12-3 5h4l-3 5"></path>
+                            </svg>
+                            Attribute 3
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 inline-block mr-2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
+                            </svg>
+                            Attribute 4
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-semibold">Abilities</h3>
+                    <ul class="grid gap-2 mt-2">
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 inline-block mr-2">
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                            Swift Strike
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 inline-block mr-2">
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                            Ability 2
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 inline-block mr-2">
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                            Ability 3
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center p-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-semibold">Equipment</h3>
+                    <ul class="grid gap-2 mt-2">
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 inline-block mr-2">
+                                <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline>
+                                <line x1="13" x2="19" y1="19" y2="13"></line>
+                                <line x1="16" x2="20" y1="16" y2="20"></line>
+                                <line x1="19" x2="21" y1="21" y2="19"></line>
+                            </svg>
+                            Andúril
+                        </li>
+                        <li></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

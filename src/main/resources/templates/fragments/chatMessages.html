@@ -1,0 +1,98 @@
+<th:block th:fragment="chatMessages(messages, sessionId, username)">
+    <section class="flex flex-col flex-1 max-h-screen pr-4">
+        <input type="hidden" id="sessionId" th:value="${sessionId}"/>
+        <input type="hidden" id="username" th:value="${username}"/>
+
+        <!-- Chat area -->
+        <div id="chatArea" class="flex-1 overflow-auto border border-gray-500 rounded-md px-4" style="scroll-behavior: smooth;">
+            <div th:each="message : ${messages}" class="space-y-1">
+                <div class="flex items-start space-x-2 mt-3">
+                    <div class="font-bold" th:text="${message.author}">John Doe</div>
+                    <div class="text-xs text-gray-500" th:text="${message.time}">10:15 AM</div>
+                </div>
+                <p th:text="${message.content}" class="text-gray-400">
+                    The party enters the dragon's den, the air is thick with tension...
+                </p>
+            </div>
+        </div>
+
+        <!-- Input area -->
+        <div class="mt-auto pt-4">
+            <form id="messageForm" class="flex flex-col">
+                <div class="flex items-center rounded border border-gray-700 bg-gray-800">
+                    <input type="text" name="message" placeholder="Type a message..."
+                           class="flex-1 p-2 bg-gray-800 text-white placeholder-gray-400 rounded-l outline-none"/>
+                    <button type="submit"
+                            class="inline-flex items-center justify-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r">
+                        Send
+                    </button>
+                </div>
+            </form>
+        </div>
+
+
+
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script> <!-- SockJS -->
+    <script src="https://cdn.jsdelivr.net/npm/stomp-websocket/lib/stomp.min.js"></script> <!-- STOMP -->
+
+    <!-- JavaScript code to connect to the WebSocket server and send/receive messages -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const sessionId = /*[[${sessionId}]]*/ 'defaultSessionId';
+        const username = /*[[${username}]]*/ 'defaultUsername';
+        const socket = new SockJS('/ws');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+
+            // Subscribe to receive messages
+            stompClient.subscribe('/topic/messages/' + sessionId, function (messageOutput) {
+                const message = JSON.parse(messageOutput.body);
+                addMessageToChat(message);
+            });
+        });
+
+        function sendMessage() {
+            const messageContent = document.querySelector('input[name="message"]').value.trim();
+            if (messageContent && stompClient) {
+                const chatMessage = {
+                    author: username,
+                    content: messageContent,
+                    time: new Date().toISOString()
+                };
+                stompClient.send("/app/chat/" + sessionId + "/sendMessage", {}, JSON.stringify(chatMessage));
+                document.querySelector('input[name="message"]').value = '';
+            }
+        }
+
+        document.getElementById('messageForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            sendMessage();
+        });
+
+        function addMessageToChat(message) {
+            const chatArea = document.getElementById('chatArea');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('space-y-1', 'mt-3');
+
+            // Convert UTC time to local time
+            const utcTime = new Date(message.time);
+            const localTime = utcTime.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: true});
+
+            messageElement.innerHTML = `
+        <div class="flex items-start space-x-2">
+            <div class="font-bold">${message.author}</div>
+            <div class="text-xs text-gray-500">${localTime}</div>
+        </div>
+        <p class="text-gray-400">${message.content}</p>
+    `;
+            chatArea.appendChild(messageElement);
+            chatArea.scrollTop = chatArea.scrollHeight; // Scroll to the bottom
+        }
+
+        /*]]>*/
+    </script>
+</th:block>

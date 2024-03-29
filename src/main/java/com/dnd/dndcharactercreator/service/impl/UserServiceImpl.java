@@ -1,0 +1,62 @@
+package com.dnd.dndcharactercreator.service.impl;
+
+import com.dnd.dndcharactercreator.model.entities.DnDUser;
+import com.dnd.dndcharactercreator.repository.DnDUserRepository;
+import com.dnd.dndcharactercreator.service.UserService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+
+  private final DnDUserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
+
+  @Override
+  public void saveUser(String username, String password) {
+    DnDUser user = userRepository.save(new DnDUser(username, passwordEncoder.encode(password)));
+    log.info("User saved: {}", user);
+  }
+
+  @Override
+  public void saveManyUsers(List<DnDUser> users) {
+    users.forEach(user -> user.setPassword(passwordEncoder.encode(user.getPassword())));
+    userRepository.saveAll(users);
+  }
+
+  @Override
+  public boolean userExists(String username) {
+    return userRepository.findByUsername(username) != null;
+  }
+
+  @Override
+  public boolean validateUser(String username, String password) {
+    DnDUser user = userRepository.findByUsername(username);
+    return user != null && passwordEncoder.matches(password, user.getPassword());
+  }
+
+  @Override
+  public List<DnDUser> getAllUsers() {
+    return userRepository.findAll();
+  }
+
+  @Override
+  public List<DnDUser> getAllUsersByIds(List<Long> ids) {
+    return userRepository.findAllById(ids);
+  }
+
+  @Override
+  public DnDUser getCurrentUser() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return (DnDUser) authentication.getPrincipal();
+  }
+
+}

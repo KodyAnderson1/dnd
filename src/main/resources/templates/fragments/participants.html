@@ -1,0 +1,28 @@
+<th:block th:fragment="participants(participants, dndSession)">
+
+    <aside class="w-80 border-l border-gray-700 p-6">
+        <!-- Session Details  -->
+        <h2 class="text-xl font-bold mb-4">Session Details</h2>
+        <p class="text-sm" th:text="'Description: ' + ${dndSession.description}">Description: The party faces a dragon
+            in its den.</p>
+        <p class="text-sm" th:text="'Duration: ' + ${dndSession.name}">Duration: 3 hours</p>
+        <p class="text-sm" th:text="'Location: ' + ${dndSession.name}">Location: The Dragon's Den</p>
+
+        <!-- Participants -->
+        <h2 class="text-xl font-bold mb-4 mt-8">Participants</h2>
+        <ul class="space-y-4">
+            <li th:each="participant, iterStat : ${participants}" class="flex items-center space-x-2">
+                <!-- Conditionally apply green for the first participant ("Dungeon Master") -->
+                <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
+                    <span class="flex h-full w-full items-center justify-center rounded-full "
+                          th:classappend="${iterStat.index == 0} ? 'border-2 border-green-700 text-green-700 font-semibold' : 'border-2 border-gray-300'"
+                          th:text="${participant.initials}">JD</span>
+                </span>
+                <div th:classappend="${iterStat.index == 0} ? 'text-green-600 font-semibold' : ''"
+                     th:text="${participant.username}">John Doe
+                </div>
+            </li>
+        </ul>
+    </aside>
+
+</th:block>
