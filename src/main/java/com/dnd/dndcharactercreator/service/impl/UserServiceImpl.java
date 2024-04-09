@@ -33,19 +33,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public boolean userExists(String username) {
-    return userRepository.findByUsername(username) != null;
-  }
-
-  @Override
-  public boolean validateUser(String username, String password) {
-    DnDUser user = userRepository.findByUsername(username);
-    return user != null && passwordEncoder.matches(password, user.getPassword());
-  }
-
-  @Override
-  public List<DnDUser> getAllUsers() {
-    return userRepository.findAll();
+  public DnDUser getById(Long id) {
+    return userRepository.findById(id).orElse(null);
   }
 
   @Override

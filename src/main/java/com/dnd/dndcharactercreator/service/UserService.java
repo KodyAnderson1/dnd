@@ -9,11 +9,7 @@ public interface UserService {
 
   void saveManyUsers(List<DnDUser> users);
 
-  boolean userExists(String username);
-
-  boolean validateUser(String username, String password);
-
-  List<DnDUser> getAllUsers();
+  DnDUser getById(Long id);
 
   List<DnDUser> getAllUsersByIds(List<Long> ids);
 

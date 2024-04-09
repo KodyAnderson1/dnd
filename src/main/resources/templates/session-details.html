@@ -11,10 +11,191 @@
     <main class="p-4">
         <h1 class="text-xl font-bold mb-4" th:text="${dndSession.name}">Session Details</h1>
         <div class="flex">
-            <section th:replace="~{fragments/chatMessages :: chatMessages(${dndSession.getChatSession().getMessages()}, ${dndSession.sessionId}, ${username})}"></section>
-            <aside th:replace="~{fragments/participants :: participants(${participants}, ${dndSession})}"></aside>
+            <!--            <section th:replace="~{fragments/chatMessages :: chatMessages(${dndSession.getChatSession().getMessages()}, ${dndSession.sessionId}, ${username})}"></section>-->
+            <!--            CHAT SECTION -->
+            <section class="flex flex-col flex-1 max-h-screen pr-4">
+                <input type="hidden" id="sessionId" th:value="${dndSession.sessionId}"/>
+                <input type="hidden" id="username" th:value="${user.getUsername()}"/>
+
+                <!-- Chat area -->
+                <div id="chatArea" class="flex-1 overflow-auto border border-gray-500 rounded-md px-4"
+                     style="scroll-behavior: smooth;">
+                    <div th:each="message : ${dndSession.getChatSession().getMessages()}" class="space-y-1">
+                        <div class="flex items-start space-x-2 mt-3">
+                            <div class="font-bold" th:text="${message.author.username}">John Doe</div>
+                            <div class="text-xs text-gray-500" th:text="${message.time}">10:15 AM</div>
+                        </div>
+                        <p th:text="${message.content}" class="text-gray-400">
+                            The party enters the dragon's den, the air is thick with tension...
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Input area -->
+                <div class="mt-auto pt-4">
+                    <form id="messageForm" class="flex flex-col">
+                        <div class="flex items-center rounded border border-gray-700 bg-gray-800">
+                            <input type="text" name="message" placeholder="Type a message..."
+                                   class="flex-1 p-2 bg-gray-800 text-white placeholder-gray-400 rounded-l outline-none"/>
+                            <select id="recipientSelect" class="p-2 bg-gray-800 text-white border-l border-gray-700">
+                                <option value="all">All</option>
+                                <option th:each="participant : ${participants}" th:value="${participant.id}"
+                                        th:text="${participant.username}"></option>
+                            </select>
+                            <button type="submit"
+                                    class="inline-flex items-center justify-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r">
+                                Send
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+
+            </section>
+            <!--            <aside th:replace="~{fragments/participants :: participants(${participants}, ${dndSession})}"></aside>-->
+            <aside class="w-80 border-l border-gray-700 p-6">
+                <!-- Session Details  -->
+                <h2 class="text-xl font-bold mb-4">Session Details</h2>
+                <p class="text-sm" th:text="'Description: ' + ${dndSession.description}">Description: The party faces a
+                    dragon
+                    in its den.</p>
+                <p class="text-sm" th:text="'Duration: ' + ${dndSession.name}">Duration: 3 hours</p>
+                <p class="text-sm" th:text="'Location: ' + ${dndSession.name}">Location: The Dragon's Den</p>
+
+                <!-- Participants -->
+                <h2 class="text-xl font-bold mb-4 mt-8">Participants</h2>
+                <ul class="participants-list space-y-4">
+                    <li th:each="participant, iterStat : ${participants}" class="flex items-center space-x-2">
+                        <!-- Conditionally apply green for the first participant ("Dungeon Master") -->
+                        <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
+                    <span class="flex h-full w-full items-center justify-center rounded-full "
+                          th:classappend="${iterStat.index == 0} ? 'border-2 border-green-700 text-green-700 font-semibold' : 'border-2 border-gray-300'"
+                          th:text="${participant.initials}">JD</span>
+                </span>
+                        <div th:classappend="${iterStat.index == 0} ? 'text-green-600 font-semibold' : ''"
+                             th:text="${participant.username}">John Doe
+                        </div>
+                    </li>
+                </ul>
+            </aside>
         </div>
     </main>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script> <!-- SockJS -->
+<script src="https://cdn.jsdelivr.net/npm/stomp-websocket/lib/stomp.min.js"></script> <!-- STOMP -->
+
+<!-- JavaScript code to connect to the WebSocket server and send/receive messages -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const sessionId = /*[[${dndSession.sessionId}]]*/ 'defaultSessionId';
+    const username = /*[[${user}]]*/ 'defaultUsername';
+    const socket = new SockJS('/ws');
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({sessionId: sessionId, userId: username.id}, function (frame) {
+        console.log('Connected: ' + frame);
+
+        // Subscribe to session broadcasts
+        stompClient.subscribe(`/topic/messages/${sessionId}`, function (messageOutput) {
+            const message = JSON.parse(messageOutput.body);
+            addMessageToChat(message, false);
+        });
+
+        // Subscribe to direct messages
+        stompClient.subscribe(`/topic/messages/${sessionId}/${username.id}`, function (messageOutput) {
+            const message = JSON.parse(messageOutput.body);
+            console.log("RECEIVED PERSONAL MESSAGE")
+            addMessageToChat(message, true);
+        });
+
+        // Subscribe to receive active user updates
+        stompClient.subscribe(`/topic/activeUsers/${sessionId}`, function (activeUsersOutput) {
+            const activeUsers = JSON.parse(activeUsersOutput.body);
+            updateActiveUsers(activeUsers);
+        });
+    });
+
+    function updateActiveUsers(activeUsers) {
+        const userList = document.querySelector('.participants-list');
+        const recipientSelect = document.getElementById('recipientSelect');
+
+        userList.innerHTML = '';
+        recipientSelect.innerHTML = '<option value="all">All</option>';
+
+        activeUsers.sort().forEach((user, index) => {
+            const isDungeonMaster = index === 0;
+
+            const userElement = document.createElement('li');
+            userElement.innerHTML = `
+            <div class="flex items-center space-x-2">
+                <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
+                    <span class="flex h-full w-full items-center justify-center rounded-full border-2 font-semibold ${isDungeonMaster ? 'border-green-700 text-green-700' : 'border-gray-300'}">${user.initials}</span>
+                </span>
+                <div class="${isDungeonMaster ? 'text-green-600 font-semibold' : ''}">${user.username}</div>
+            </div>
+        `;
+
+            userList.appendChild(userElement);
+
+            const optionElement = document.createElement('option');
+            optionElement.value = user.id;
+            optionElement.textContent = user.username;
+            recipientSelect.appendChild(optionElement);
+        });
+    }
+
+    function sendMessage() {
+        const messageContent = document.querySelector('input[name="message"]').value.trim();
+        const recipientSelect = document.getElementById('recipientSelect');
+        const sendToAll = recipientSelect.value === 'all';
+        const recipient = sendToAll ? null : recipientSelect.value;
+
+        if (messageContent && stompClient) {
+            const chatMessage = {
+                author: username,
+                content: messageContent,
+                time: new Date().toISOString(),
+                ...(sendToAll ? {} : {recipient: recipient}) // Include recipient if not sending to all, otherwise send nothing
+            };
+
+            const destination = sendToAll ? `/chat/${sessionId}/sendMessage` : `/chat/${sessionId}/sendDirectMessage`
+            stompClient.send(destination, {}, JSON.stringify(chatMessage));
+            document.querySelector('input[name="message"]').value = '';
+        }
+    }
+
+    document.getElementById('messageForm').addEventListener('submit', function (e) {
+        e.preventDefault(); // prevent page reload on submit
+        sendMessage();
+    });
+
+    function addMessageToChat(message, isPrivate) {
+        const chatArea = document.getElementById('chatArea');
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('mt-3');
+
+        const utcTime = new Date(message.time);
+        const localTime = utcTime.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: true});
+
+        let privateIndicator = isPrivate ? '<div class="text-xs text-red-500 ml-auto">Private</div>' : '';
+        let messageBgClass = isPrivate ? 'bg-red-800' : 'text-gray-400';
+
+        messageElement.innerHTML = `
+        <div class="flex items-start space-x-2">
+            <div class="font-bold">${message.author.username}</div>
+            <div class="text-xs text-gray-500">${localTime}</div>
+            ${privateIndicator}
+        </div>
+        <p class="${messageBgClass}">${message.content}</p>
+    `;
+        chatArea.appendChild(messageElement);
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+
+    /*]]>*/
+</script>
+
 </body>
 </html>

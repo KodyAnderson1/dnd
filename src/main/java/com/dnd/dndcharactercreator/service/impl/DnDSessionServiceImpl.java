@@ -4,14 +4,18 @@ import com.dnd.dndcharactercreator.model.DnDSessionDetails;
 import com.dnd.dndcharactercreator.model.chat.ChatMessage;
 import com.dnd.dndcharactercreator.model.entities.DnDUser;
 import com.dnd.dndcharactercreator.service.DnDSessionService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+
+@Slf4j
 @Service
 public class DnDSessionServiceImpl implements DnDSessionService {
 
@@ -19,11 +23,12 @@ public class DnDSessionServiceImpl implements DnDSessionService {
   private final ConcurrentHashMap<String, DnDSessionDetails> sessions;
 
   public DnDSessionServiceImpl() {
-    sessions = new ConcurrentHashMap<>();
+    this.sessions = new ConcurrentHashMap<>();
 
     // TODO: Load sessions from database
 
   }
+
 
   @Override
   public DnDSessionDetails createSession(String name, String description) {
@@ -31,7 +36,6 @@ public class DnDSessionServiceImpl implements DnDSessionService {
     DnDSessionDetails session = new DnDSessionDetails(sessionId, name, description, getUserId());
 
     // TODO: Save the session to database
-
 
     return sessions.computeIfAbsent(sessionId, newSession -> session); // Add session to in memory storage and return it
   }
@@ -42,18 +46,23 @@ public class DnDSessionServiceImpl implements DnDSessionService {
   }
 
   @Override
-  public DnDSessionDetails joinSession(String sessionId) {
+  public DnDSessionDetails joinSession(String sessionId, DnDUser user) {
     // This assumes that the session exists, will be null if it doesn't
     DnDSessionDetails session = sessions.get(sessionId);
 
-    session.addParticipant(getUserId());
+    session.addParticipant(user);
 
     return session;
   }
 
   @Override
+  public DnDSessionDetails getSession(String sessionId) {
+    return sessions.get(sessionId);
+  }
+
+  @Override
   public void createManySessions(List<DnDSessionDetails> sessions) {
-    sessions.forEach(session -> this.sessions.put(session.getSessionId(), session));
+    sessions.forEach(session -> this.sessions.putIfAbsent(session.getSessionId(), session));
   }
 
   @Override
@@ -62,8 +71,8 @@ public class DnDSessionServiceImpl implements DnDSessionService {
   }
 
   @Override
-  public List<ChatMessage> getChatMessages(String sessionId) {
-    return sessions.get(sessionId).getChatSession().getMessages();
+  public List<DnDUser> getActiveUsers(String sessionId) {
+    return sessions.get(sessionId).getParticipants();
   }
 
   private int getUserId() {

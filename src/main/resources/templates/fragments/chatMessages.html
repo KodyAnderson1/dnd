@@ -1,98 +1,117 @@
-<th:block th:fragment="chatMessages(messages, sessionId, username)">
-    <section class="flex flex-col flex-1 max-h-screen pr-4">
-        <input type="hidden" id="sessionId" th:value="${sessionId}"/>
-        <input type="hidden" id="username" th:value="${username}"/>
+<!--<th:block th:fragment="chatMessages(messages, sessionId, username)">-->
+<!--    <section class="flex flex-col flex-1 max-h-screen pr-4">-->
+<!--        <input type="hidden" id="sessionId" th:value="${sessionId}"/>-->
+<!--        <input type="hidden" id="username" th:value="${username}"/>-->
 
-        <!-- Chat area -->
-        <div id="chatArea" class="flex-1 overflow-auto border border-gray-500 rounded-md px-4" style="scroll-behavior: smooth;">
-            <div th:each="message : ${messages}" class="space-y-1">
-                <div class="flex items-start space-x-2 mt-3">
-                    <div class="font-bold" th:text="${message.author}">John Doe</div>
-                    <div class="text-xs text-gray-500" th:text="${message.time}">10:15 AM</div>
-                </div>
-                <p th:text="${message.content}" class="text-gray-400">
-                    The party enters the dragon's den, the air is thick with tension...
-                </p>
-            </div>
-        </div>
+<!--        &lt;!&ndash; Chat area &ndash;&gt;-->
+<!--        <div id="chatArea" class="flex-1 overflow-auto border border-gray-500 rounded-md px-4"-->
+<!--             style="scroll-behavior: smooth;">-->
+<!--            <div th:each="message : ${messages}" class="space-y-1">-->
+<!--                <div class="flex items-start space-x-2 mt-3">-->
+<!--                    <div class="font-bold" th:text="${message.author}">John Doe</div>-->
+<!--                    <div class="text-xs text-gray-500" th:text="${message.time}">10:15 AM</div>-->
+<!--                </div>-->
+<!--                <p th:text="${message.content}" class="text-gray-400">-->
+<!--                    The party enters the dragon's den, the air is thick with tension...-->
+<!--                </p>-->
+<!--            </div>-->
+<!--        </div>-->
 
-        <!-- Input area -->
-        <div class="mt-auto pt-4">
-            <form id="messageForm" class="flex flex-col">
-                <div class="flex items-center rounded border border-gray-700 bg-gray-800">
-                    <input type="text" name="message" placeholder="Type a message..."
-                           class="flex-1 p-2 bg-gray-800 text-white placeholder-gray-400 rounded-l outline-none"/>
-                    <button type="submit"
-                            class="inline-flex items-center justify-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r">
-                        Send
-                    </button>
-                </div>
-            </form>
-        </div>
+<!--        &lt;!&ndash; Input area &ndash;&gt;-->
+<!--        <div class="mt-auto pt-4">-->
+<!--            <form id="messageForm" class="flex flex-col">-->
+<!--                <div class="flex items-center rounded border border-gray-700 bg-gray-800">-->
+<!--                    <input type="text" name="message" placeholder="Type a message..."-->
+<!--                           class="flex-1 p-2 bg-gray-800 text-white placeholder-gray-400 rounded-l outline-none"/>-->
+<!--                    <button type="submit"-->
+<!--                            class="inline-flex items-center justify-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r">-->
+<!--                        Send-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--            </form>-->
+<!--        </div>-->
 
 
+<!--    </section>-->
 
-    </section>
+<!--    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script> &lt;!&ndash; SockJS &ndash;&gt;-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/stomp-websocket/lib/stomp.min.js"></script> &lt;!&ndash; STOMP &ndash;&gt;-->
 
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script> <!-- SockJS -->
-    <script src="https://cdn.jsdelivr.net/npm/stomp-websocket/lib/stomp.min.js"></script> <!-- STOMP -->
+<!--    &lt;!&ndash; JavaScript code to connect to the WebSocket server and send/receive messages &ndash;&gt;-->
+<!--    <script th:inline="javascript">-->
+<!--        /*<![CDATA[*/-->
+<!--        const sessionId = /*[[${sessionId}]]*/ 'defaultSessionId';-->
+<!--        const username = /*[[${username}]]*/ 'defaultUsername';-->
+<!--        const socket = new SockJS('/ws');-->
+<!--        const stompClient = Stomp.over(socket);-->
 
-    <!-- JavaScript code to connect to the WebSocket server and send/receive messages -->
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        const sessionId = /*[[${sessionId}]]*/ 'defaultSessionId';
-        const username = /*[[${username}]]*/ 'defaultUsername';
-        const socket = new SockJS('/ws');
-        const stompClient = Stomp.over(socket);
+<!--        stompClient.connect({}, function (frame) {-->
+<!--            console.log('Connected: ' + frame);-->
 
-        stompClient.connect({}, function (frame) {
-            console.log('Connected: ' + frame);
+<!--            //     // Subscribe to receive messages-->
+<!--            //     stompClient.subscribe('/topic/messages/' + sessionId, function (messageOutput) {-->
+<!--            //         const message = JSON.parse(messageOutput.body);-->
+<!--            //         addMessageToChat(message);-->
+<!--            //     });-->
+<!--            // });-->
 
-            // Subscribe to receive messages
-            stompClient.subscribe('/topic/messages/' + sessionId, function (messageOutput) {
-                const message = JSON.parse(messageOutput.body);
-                addMessageToChat(message);
-            });
-        });
+<!--            // Subscribe to session broadcasts-->
+<!--            stompClient.subscribe('/topic/messages/' + sessionId, function (messageOutput) {-->
+<!--                const message = JSON.parse(messageOutput.body);-->
+<!--                addMessageToChat(message, false); // false indicating not a direct message-->
+<!--            });-->
 
-        function sendMessage() {
-            const messageContent = document.querySelector('input[name="message"]').value.trim();
-            if (messageContent && stompClient) {
-                const chatMessage = {
-                    author: username,
-                    content: messageContent,
-                    time: new Date().toISOString()
-                };
-                stompClient.send("/app/chat/" + sessionId + "/sendMessage", {}, JSON.stringify(chatMessage));
-                document.querySelector('input[name="message"]').value = '';
-            }
-        }
+<!--            // Subscribe to direct messages-->
+<!--            stompClient.subscribe('/user/queue/messages', function (messageOutput) {-->
+<!--                const message = JSON.parse(messageOutput.body);-->
+<!--                addMessageToChat(message, true); // true indicating a direct message-->
+<!--            });-->
 
-        document.getElementById('messageForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            sendMessage();
-        });
+<!--            function sendMessage() {-->
+<!--                const messageContent = document.querySelector('input[name="message"]').value.trim();-->
+<!--                const sendToAll = document.getElementById('sendToAll').checked; // Assuming there's a checkbox for choosing to send to all-->
+<!--                const recipient = document.getElementById('recipient').value; // Assuming there's a way to select a recipient-->
 
-        function addMessageToChat(message) {
-            const chatArea = document.getElementById('chatArea');
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('space-y-1', 'mt-3');
+<!--                if (messageContent && stompClient) {-->
+<!--                    const chatMessage = {-->
+<!--                        author: username,-->
+<!--                        content: messageContent,-->
+<!--                        time: new Date().toISOString(),-->
+<!--                        ...(sendToAll ? {} : {recipient: recipient}) // Include recipient if not sending to all-->
+<!--                    };-->
 
-            // Convert UTC time to local time
-            const utcTime = new Date(message.time);
-            const localTime = utcTime.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: true});
+<!--                    const destination = sendToAll ? "/app/chat/" + sessionId + "/sendMessage" : "/app/chat/sendDirectMessage";-->
+<!--                    stompClient.send(destination, {}, JSON.stringify(chatMessage));-->
+<!--                    document.querySelector('input[name="message"]').value = '';-->
+<!--                }-->
+<!--            }-->
 
-            messageElement.innerHTML = `
-        <div class="flex items-start space-x-2">
-            <div class="font-bold">${message.author}</div>
-            <div class="text-xs text-gray-500">${localTime}</div>
-        </div>
-        <p class="text-gray-400">${message.content}</p>
-    `;
-            chatArea.appendChild(messageElement);
-            chatArea.scrollTop = chatArea.scrollHeight; // Scroll to the bottom
-        }
+<!--            document.getElementById('messageForm').addEventListener('submit', function (e) {-->
+<!--                e.preventDefault(); // prevent page reload on submit-->
+<!--                sendMessage();-->
+<!--            });-->
 
-        /*]]>*/
-    </script>
-</th:block>
+<!--            function addMessageToChat(message) {-->
+<!--                // Function to display messages, could visually differentiate direct messages if needed-->
+<!--                const chatArea = document.getElementById('chatArea');-->
+<!--                const messageElement = document.createElement('div');-->
+<!--                messageElement.classList.add('space-y-1', 'mt-3');-->
+
+<!--                // Convert UTC time to local time-->
+<!--                const utcTime = new Date(message.time);-->
+<!--                const localTime = utcTime.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: true});-->
+
+<!--                messageElement.innerHTML = `-->
+<!--        <div class="flex items-start space-x-2">-->
+<!--            <div class="font-bold">${message.author}</div>-->
+<!--            <div class="text-xs text-gray-500">${localTime}</div>-->
+<!--        </div>-->
+<!--        <p class="text-gray-400">${message.content}</p>-->
+<!--    `;-->
+<!--                chatArea.appendChild(messageElement);-->
+<!--                chatArea.scrollTop = chatArea.scrollHeight; // Scroll to the bottom-->
+<!--            }-->
+
+<!--        /*]]>*/-->
+<!--    </script>-->
+<!--</th:block>-->

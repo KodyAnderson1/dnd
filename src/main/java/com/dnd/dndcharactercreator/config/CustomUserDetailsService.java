@@ -2,26 +2,23 @@ package com.dnd.dndcharactercreator.config;
 
 import com.dnd.dndcharactercreator.model.entities.DnDUser;
 import com.dnd.dndcharactercreator.repository.DnDUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-  @Autowired
-  private DnDUserRepository userRepository;
-
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+  private final DnDUserRepository userRepository; // final + @RequiredArgsConstructor is the same as @Autowired
 
   @Override
   public DnDUser loadUserByUsername(String username) throws UsernameNotFoundException {
-    System.out.println("=== ### === @@@ === Load User By Username: " + username);
+    log.info("=== ### === @@@ === Load User By Username: " + username);
     DnDUser user = userRepository.findByUsername(username);
 
     if (user == null) {

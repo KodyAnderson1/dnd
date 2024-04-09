@@ -1,25 +1,29 @@
 package com.dnd.dndcharactercreator.model;
 
-import com.dnd.dndcharactercreator.model.chat.ChatMessage;
 import com.dnd.dndcharactercreator.model.chat.ChatSession;
+import com.dnd.dndcharactercreator.model.entities.DnDUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+@Slf4j
 @Getter
 @Setter
 @AllArgsConstructor
 public class DnDSessionDetails {
 
   private String sessionId;
+  private String StompId;
   private String name;
   private String description;
-  private List<Integer> participants; // User IDs
+  private List<DnDUser> participants; // User IDs
   private LocalDateTime startTime;
   private ChatSession chatSession; // Chat messages
   private Long creatorId; // User ID of the session creator
@@ -49,18 +53,15 @@ public class DnDSessionDetails {
     return participants.size();
   }
 
-  public void addParticipant(int participantId) {
-    System.out.println("Adding participant " + participantId + " to session " + sessionId);
+  public void addParticipant(DnDUser participant) {
+    log.info("Adding participant " + participant.getId() + " to session " + sessionId);
 
-    // If user is not already in the session, add them
-    if (!participants.contains(participantId)) {
-      participants.add(participantId);
+    boolean containsId = participants.stream().anyMatch(item -> Objects.equals(item.getId(), participant.getId()));
+
+    if (!containsId) {
+      participants.add(participant);
     }
 
-  }
-
-  public ChatMessage addMessage(String sender, String content) {
-    return chatSession.addMessage(new ChatMessage(sender, content));
   }
 
 }
