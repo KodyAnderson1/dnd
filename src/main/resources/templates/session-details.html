@@ -35,8 +35,11 @@
                 <div class="mt-auto pt-4">
                     <form id="messageForm" class="flex flex-col">
                         <div class="flex items-center rounded border border-gray-700 bg-gray-800">
-                            <input type="text" name="message" placeholder="Type a message..."
+                            <label for="chat-message" class="hidden">Chat Message</label>
+                            <input type="text" id="chat-message" name="message" placeholder="Type a message..."
                                    class="flex-1 p-2 bg-gray-800 text-white placeholder-gray-400 rounded-l outline-none"/>
+
+                            <label for="recipientSelect" class="hidden">Message Viewable By</label>
                             <select id="recipientSelect" class="p-2 bg-gray-800 text-white border-l border-gray-700">
                                 <option value="all">All</option>
                                 <option th:each="participant : ${participants}" th:value="${participant.id}"
