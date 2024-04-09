@@ -20,7 +20,7 @@ import java.util.Objects;
 public class DnDSessionDetails {
 
   private String sessionId;
-  private String StompId;
+  private List<String> stompIds;
   private String name;
   private String description;
   private List<DnDUser> participants; // User IDs
@@ -36,6 +36,7 @@ public class DnDSessionDetails {
     this.startTime = LocalDateTime.now();
     this.chatSession = new ChatSession(sessionId);
     this.creatorId = null;
+    this.stompIds = new ArrayList<>();
   }
 
   @Builder
@@ -47,6 +48,7 @@ public class DnDSessionDetails {
     this.startTime = LocalDateTime.now();
     this.chatSession = new ChatSession(sessionId);
     this.creatorId = (long) creatorId;
+    this.stompIds = new ArrayList<>();
   }
 
   public int getParticipantCount() {

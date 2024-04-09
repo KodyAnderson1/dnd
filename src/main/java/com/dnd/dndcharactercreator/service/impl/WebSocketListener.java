@@ -54,11 +54,9 @@ public class WebSocketListener {
     }
 
     log.info("Added participant to session");
-    activeSession.addParticipant(user);
+    dnDSessionService.joinSession(sessionId, user);
 
-    if (activeSession.getStompId() == null || activeSession.getStompId().isBlank()) {
-      activeSession.setStompId(accessor.getSessionId());
-    }
+    activeSession.getStompIds().add(accessor.getSessionId());
 
     messagingTemplate.convertAndSend("/topic/activeUsers/" + sessionId, activeSession.getParticipants());
   }
@@ -82,7 +80,7 @@ public class WebSocketListener {
     }
 
     DnDSessionDetails currSession = dnDSessionService.getAllSessions().stream()
-            .filter(session -> stompId.equals(session.getStompId()))
+            .filter(session -> session.getStompIds().contains(stompId))
             .findFirst()
             .orElse(null);
 
@@ -106,6 +104,7 @@ public class WebSocketListener {
         return (DnDUser) principalDetails;
       }
     }
+    log.info("Principal != InstanceOf Authentication, returning...");
     return null;
   }
 
@@ -117,6 +116,7 @@ public class WebSocketListener {
         return (DnDUser) principalDetails;
       }
     }
+    log.info("Principal != InstanceOf Authentication, returning...");
     return null;
   }
 
@@ -129,6 +129,7 @@ public class WebSocketListener {
       return isNull(userIdValue) ? null : userIdValue.stream().findFirst().orElse(null);
     }
 
+    log.info("Generic is null, returning...");
     return null;
   }
 }
