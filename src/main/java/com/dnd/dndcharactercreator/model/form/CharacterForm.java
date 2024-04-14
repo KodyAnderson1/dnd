@@ -1,29 +1,17 @@
-package com.dnd.dndcharactercreator.model.entities;
+package com.dnd.dndcharactercreator.model.form;
 
-import com.dnd.dndcharactercreator.model.form.CharacterForm;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.dnd.dndcharactercreator.model.entities.DnDCharacter;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Entity
-@Getter
-@Setter
-@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "dnd_characters")
-public class DnDCharacter {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class CharacterForm {
   private Long id;
   private String userGuid;
+
   private String name;
   private String characterClass;
   private String race;
@@ -37,18 +25,9 @@ public class DnDCharacter {
   private double wisdom;
   private double charisma;
 
-  public DnDCharacter(SessionCharacter character) {
-    this.userGuid = character.getUserGuid();
-    this.name = character.getName();
-    this.characterClass = character.getCharacterClass();
-    this.race = character.getRace();
-    this.icon = character.getIcon();
-  }
-
-  public DnDCharacter(CharacterForm character) {
+  public CharacterForm(DnDCharacter character) {
     this.id = character.getId();
     this.userGuid = character.getUserGuid();
-
     this.name = character.getName();
     this.characterClass = character.getCharacterClass();
     this.race = character.getRace();
@@ -62,4 +41,5 @@ public class DnDCharacter {
     this.wisdom = character.getWisdom();
     this.charisma = character.getCharisma();
   }
+
 }

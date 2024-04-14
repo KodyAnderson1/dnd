@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${error.title}">Error Page</title>
+    <!-- Styles and other head elements -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+</head>
+
+<main class="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 text-center px-4 sm:px-6 lg:px-8">
+    <div class="w-24 h-24 rounded-full bg-red-500 flex items-center justify-center">
+        <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-12 w-12 text-white"
+        >
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+        </svg>
+    </div>
+    <h1 class="mt-8 text-4xl font-extrabold text-gray-900 dark:text-gray-100" th:text="${error.title}">Oops! Something
+        went wrong.</h1>
+    <p class="mt-2 text-base text-gray-500 dark:text-gray-400" th:text="${error.subTitle}">
+        We're sorry for the inconvenience. Our team has been notified and will fix the issue as soon as possible.
+    </p>
+    <p class="mt-2 text-base text-gray-500 dark:text-gray-400" th:text="${error.code}">AE010</p>
+    <div class="mt-6">
+        <a class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700"
+           href="/">
+            Back To Dashboard
+        </a>
+    </div>
+</main>
+</body>
+</html>

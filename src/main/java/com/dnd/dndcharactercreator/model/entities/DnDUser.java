@@ -5,7 +5,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -29,11 +29,13 @@ public class DnDUser implements UserDetails {
   private String username;
   private String initials;
   private String password;
+  private String guid;
 
   public DnDUser(String username, String password) {
     this.username = username;
     this.password = password;
     this.initials = getUserInitials(username);
+    this.guid = UUID.randomUUID().toString();
   }
 
   public DnDUser(Long userId, String username, String password) {
@@ -41,6 +43,15 @@ public class DnDUser implements UserDetails {
     this.username = username;
     this.password = password;
     this.initials = getUserInitials(username);
+    this.guid = UUID.randomUUID().toString();
+  }
+
+  public DnDUser(Long userId, String username, String password, String guid) {
+    this.id = userId;
+    this.username = username;
+    this.password = password;
+    this.initials = getUserInitials(username);
+    this.guid = guid;
   }
 
   @Override

@@ -15,12 +15,12 @@ public interface CharacterService {
 
   List<DnDCharacter> getAllCharactersByUser();
 
-  List<DnDCharacter> getAllCharacters();
-
   void updateCharacter(DnDCharacter dnDCharacter);
 
-  void deleteCharacter(Long id);
+  void deleteCharacter(Long id, String userId);
 
+
+  //  TODO: Create Separate Service for below
   List<DnDClass> getAllClasses();
 
   List<Race> getAllRaces();

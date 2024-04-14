@@ -2,7 +2,7 @@ package com.dnd.dndcharactercreator.controller;
 
 import com.dnd.dndcharactercreator.model.chat.ChatMessage;
 import com.dnd.dndcharactercreator.model.entities.DnDUser;
-import com.dnd.dndcharactercreator.service.DnDSessionService;
+import com.dnd.dndcharactercreator.service.ActiveSessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebSocketController {
 
-  private final DnDSessionService sessionService; // final + @RequiredArgsConstructor is the same as @Autowired
+  private final ActiveSessionManager sessionService; // final + @RequiredArgsConstructor is the same as @Autowired
   private final SimpMessagingTemplate messagingTemplate;
 
   // WebSocket communication for each session chat.

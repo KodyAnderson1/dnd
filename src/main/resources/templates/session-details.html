@@ -154,18 +154,19 @@
         const sendToAll = recipientSelect.value === 'all';
         const recipient = sendToAll ? null : recipientSelect.value;
 
-        if (messageContent && stompClient) {
-            const chatMessage = {
-                author: username,
-                content: messageContent,
-                time: new Date().toISOString(),
-                ...(sendToAll ? {} : {recipient: recipient}) // Include recipient if not sending to all, otherwise send nothing
-            };
+        if (!messageContent || !stompClient) return;
 
-            const destination = sendToAll ? `/chat/${sessionId}/sendMessage` : `/chat/${sessionId}/sendDirectMessage`
-            stompClient.send(destination, {}, JSON.stringify(chatMessage));
-            document.querySelector('input[name="message"]').value = '';
-        }
+        const chatMessage = {
+            author: username,
+            content: messageContent,
+            time: new Date().toISOString(),
+            ...(sendToAll ? {} : {recipient: recipient}) // Include recipient if not sending to all, otherwise send nothing
+        };
+
+        const destination = sendToAll ? `/chat/${sessionId}/sendMessage` : `/chat/${sessionId}/sendDirectMessage`
+        stompClient.send(destination, {}, JSON.stringify(chatMessage));
+        document.querySelector('input[name="message"]').value = '';
+
     }
 
     document.getElementById('messageForm').addEventListener('submit', function (e) {

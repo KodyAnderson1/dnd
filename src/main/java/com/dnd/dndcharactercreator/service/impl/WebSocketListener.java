@@ -1,8 +1,8 @@
 package com.dnd.dndcharactercreator.service.impl;
 
-import com.dnd.dndcharactercreator.model.DnDSessionDetails;
+import com.dnd.dndcharactercreator.model.ActiveSession;
 import com.dnd.dndcharactercreator.model.entities.DnDUser;
-import com.dnd.dndcharactercreator.service.DnDSessionService;
+import com.dnd.dndcharactercreator.service.ActiveSessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -27,38 +27,37 @@ import static java.util.Objects.nonNull;
 public class WebSocketListener {
 
   private final SimpMessagingTemplate messagingTemplate;
-  private final DnDSessionService dnDSessionService;
+  private final ActiveSessionManager activeSessionManager;
 
   @EventListener
   public void handleWebSocketConnectListener(SessionConnectedEvent event) {
     log.info("=== Connected Event Occurred");
     StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-    String sessionId = getSessionId(accessor);
-    DnDUser user = getUser(event);
+    String dndSessionId = getSessionId(accessor);
 
-    if (sessionId == null) {
+    if (dndSessionId == null) {
       log.info("SessionId is null in the SessionConnectedEvent");
       return;
     }
 
-    DnDSessionDetails activeSession = dnDSessionService.getSession(sessionId);
+    DnDUser user = getUser(event.getUser());
 
-    if (activeSession == null) {
-      log.info("Active session not found for sessionId: " + sessionId);
+    if (user == null) {
+      log.info("User not found to connect to session {}", dndSessionId);
       return;
     }
 
-    if (user == null) {
-      log.info("User Is null for sessionId: " + sessionId);
+    ActiveSession activeSession = activeSessionManager.getSession(dndSessionId);
+
+    if (activeSession == null) {
+      log.info("Active session not found for sessionId: " + dndSessionId);
       return;
     }
 
     log.info("Added participant to session");
-    dnDSessionService.joinSession(sessionId, user);
+    activeSessionManager.joinSession(dndSessionId, user, accessor.getSessionId());
 
-    activeSession.getStompIds().add(accessor.getSessionId());
-
-    messagingTemplate.convertAndSend("/topic/activeUsers/" + sessionId, activeSession.getParticipants());
+    messagingTemplate.convertAndSend("/topic/activeUsers/" + dndSessionId, activeSession.getActiveParticipants());
   }
 
   @EventListener
@@ -72,14 +71,14 @@ public class WebSocketListener {
       return;
     }
 
-    DnDUser user = getUser(event);
+    DnDUser user = getUser(event.getUser());
 
     if (user == null) {
       log.info("User not found for the disconnected session.");
       return;
     }
 
-    DnDSessionDetails currSession = dnDSessionService.getAllSessions().stream()
+    ActiveSession currSession = activeSessionManager.getAllSessions().stream()
             .filter(session -> session.getStompIds().contains(stompId))
             .findFirst()
             .orElse(null);
@@ -89,33 +88,20 @@ public class WebSocketListener {
       return;
     }
 
-    List<DnDUser> participants = currSession.getParticipants();
-    participants.removeIf(participant -> participant.getId().equals(user.getId()));
+    currSession.removeParticipant(user.getGuid());
 
     log.info("Removed participant from session");
-    messagingTemplate.convertAndSend("/topic/activeUsers/" + currSession.getSessionId(), participants);
+    messagingTemplate.convertAndSend("/topic/activeUsers/" + currSession.getSessionId(), currSession.getActiveParticipants());
   }
 
-  private DnDUser getUser(SessionConnectedEvent event) {
-    Principal principal = event.getUser();
+  private DnDUser getUser(Principal principal) {
     if (principal instanceof Authentication authentication) {
       Object principalDetails = authentication.getPrincipal();
       if (principalDetails instanceof DnDUser) {
         return (DnDUser) principalDetails;
       }
     }
-    log.info("Principal != InstanceOf Authentication, returning...");
-    return null;
-  }
 
-  private DnDUser getUser(SessionDisconnectEvent event) {
-    Principal principal = event.getUser();
-    if (principal instanceof Authentication authentication) {
-      Object principalDetails = authentication.getPrincipal();
-      if (principalDetails instanceof DnDUser) {
-        return (DnDUser) principalDetails;
-      }
-    }
     log.info("Principal != InstanceOf Authentication, returning...");
     return null;
   }

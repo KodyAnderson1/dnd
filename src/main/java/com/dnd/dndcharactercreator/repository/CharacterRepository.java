@@ -8,5 +8,9 @@ import java.util.List;
 
 @Repository
 public interface CharacterRepository extends JpaRepository<DnDCharacter, Long> {
-  List<DnDCharacter> findAllByUserId(int id);
+  List<DnDCharacter> findAllByUserGuid(String userGuid);
+
+  DnDCharacter findByIdAndUserGuid(Long id, String userGuid);
+
+  void removeByIdAndUserGuid(Long id, String userGuid);
 }

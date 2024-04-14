@@ -1,5 +1,6 @@
 package com.dnd.dndcharactercreator.service.impl;
 
+import com.dnd.dndcharactercreator.exception.DnDException;
 import com.dnd.dndcharactercreator.model.entities.DnDCharacter;
 import com.dnd.dndcharactercreator.model.entities.DnDClass;
 import com.dnd.dndcharactercreator.model.entities.DnDUser;
@@ -8,6 +9,7 @@ import com.dnd.dndcharactercreator.repository.CharacterRepository;
 import com.dnd.dndcharactercreator.repository.DnDClassRepository;
 import com.dnd.dndcharactercreator.repository.RaceRepository;
 import com.dnd.dndcharactercreator.service.CharacterService;
+import com.dnd.dndcharactercreator.utils.ExceptionCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -31,21 +33,23 @@ public class CharacterServiceImpl implements CharacterService {
   }
 
   public DnDCharacter saveCharacter(DnDCharacter dnDCharacter) {
-    dnDCharacter.setUserId(getUserId());
+    dnDCharacter.setUserGuid(getUserGuid());
     return characterRepository.save(dnDCharacter);
   }
 
   public DnDCharacter getCharacterById(Long id) {
-    return characterRepository.findById(id).orElseThrow(() -> new RuntimeException("Character not found"));
+    String userGuid = getUserGuid();
+    DnDCharacter character = characterRepository.findByIdAndUserGuid(id, userGuid);
+
+    if (character == null) {
+      throw new DnDException("No Character with Id " + id + " found for " + userGuid, ExceptionCodes.AE103);
+    }
+
+    return character;
   }
 
   public List<DnDCharacter> getAllCharactersByUser() {
-    return characterRepository.findAllByUserId(getUserId());
-  }
-
-  @Override
-  public List<DnDCharacter> getAllCharacters() {
-    return characterRepository.findAll();
+    return characterRepository.findAllByUserGuid(getUserGuid());
   }
 
   public void updateCharacter(DnDCharacter dnDCharacter) {
@@ -53,8 +57,8 @@ public class CharacterServiceImpl implements CharacterService {
   }
 
   @Override
-  public void deleteCharacter(Long id) {
-
+  public void deleteCharacter(Long id, String userGuid) {
+    characterRepository.removeByIdAndUserGuid(id, userGuid);
   }
 
   @Override
@@ -77,10 +81,16 @@ public class CharacterServiceImpl implements CharacterService {
     classRepository.saveAll(classes);
   }
 
-  private int getUserId() {
+  private String getUserGuid() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     DnDUser userDetails = (DnDUser) authentication.getPrincipal();
-    return Math.toIntExact(userDetails.getId());
+    return userDetails.getGuid();
+  }
+
+  private Long getUserId() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    DnDUser userDetails = (DnDUser) authentication.getPrincipal();
+    return userDetails.getId();
   }
 
 }

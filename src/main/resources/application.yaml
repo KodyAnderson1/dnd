@@ -23,9 +23,17 @@ spring:
 
 logging:
   level:
-    org:
-      springframework:
-        jdbc:
-          datasource:
-            init:
-              ScriptUtils: DEBUG
+    org.springframework.jdbc:
+          datasource.init.ScriptUtils: DEBUG
+#    root: debug
+
+
+stats:
+  base:
+    mana: 10
+    stamina: 50
+    health: 100
+  perLevelIncrease:
+    dexterity: 10 # add 10 to stamina
+    intelligence: 10 # add 10 to mana
+    constitution: 10 # add 10 to health
