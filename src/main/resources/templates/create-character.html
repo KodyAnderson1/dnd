@@ -19,5 +19,20 @@
         </div>
     </div>
 </main>
+
+<script>
+    function increment(statKey) {
+        let inputElement = document.getElementById(statKey);
+        inputElement.value = parseFloat(inputElement.value) + 1;
+    }
+
+    function decrement(statKey) {
+        let inputElement = document.getElementById(statKey);
+        let currentValue = parseFloat(inputElement.value);
+        if (currentValue > 0) { // Prevent stats from going below 0
+            inputElement.value = currentValue - 1;
+        }
+    }
+</script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 package com.dnd.dndcharactercreator.config;
 
-import com.dnd.dndcharactercreator.model.ActiveSession;
+import com.dnd.dndcharactercreator.model.session.ActiveSession;
 import com.dnd.dndcharactercreator.model.entities.DnDCharacter;
 import com.dnd.dndcharactercreator.model.entities.DnDClass;
 import com.dnd.dndcharactercreator.model.entities.DnDSession;
@@ -75,15 +75,7 @@ public class DataInitializer implements CommandLineRunner {
             new DnDUser(1L, "KodyAnderson1", "re", "38dda5d2-ffbb-41b4-b53f-0046d64f67b3"),
             new DnDUser(2L, "KodyAnderson2", "re"),
             new DnDUser(3L, "KodyAnderson3", "re"),
-            new DnDUser(4L, "KodyAnderson4", "re"),
-            new DnDUser(5L, "KodyAnderson5", "re"),
-            new DnDUser(6L, "KodyAnderson6", "re"),
-            new DnDUser(7L, "KodyAnderson7", "re"),
-            new DnDUser(8L, "KodyAnderson8", "re"),
-            new DnDUser(9L, "KodyAnderson9", "re"),
-            new DnDUser(10L, "KodyAnderson10", "re"),
-            new DnDUser(11L, "KodyAnderson11", "re"),
-            new DnDUser(12L, "KodyAnderson12", "re")
+            new DnDUser(4L, "KodyAnderson4", "re")
     ));
   }
 
@@ -100,7 +92,8 @@ public class DataInitializer implements CommandLineRunner {
     characterService.saveAllRaces(getRaces());
     characterService.saveAllClasses(getClasses());
     characterService.saveAllCharacters(getCharacters());
-    userService.saveManyUsers(getUsers());
+
+    getUsers().forEach(userService::saveUser);
 
     getSessions().forEach(session -> {
 

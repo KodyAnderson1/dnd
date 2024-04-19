@@ -1,6 +1,6 @@
 package com.dnd.dndcharactercreator.service.impl;
 
-import com.dnd.dndcharactercreator.model.ActiveSession;
+import com.dnd.dndcharactercreator.model.session.ActiveSession;
 import com.dnd.dndcharactercreator.model.entities.DnDUser;
 import com.dnd.dndcharactercreator.service.ActiveSessionManager;
 import lombok.RequiredArgsConstructor;

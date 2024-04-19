@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class CharacterForm {
   private Long id;
@@ -24,6 +23,16 @@ public class CharacterForm {
   private double intelligence;
   private double wisdom;
   private double charisma;
+
+  public CharacterForm() {
+    this.strength = 10;
+    this.initiative = 10;
+    this.dexterity = 10;
+    this.constitution = 10;
+    this.intelligence = 10;
+    this.wisdom = 10;
+    this.charisma = 10;
+  }
 
   public CharacterForm(DnDCharacter character) {
     this.id = character.getId();

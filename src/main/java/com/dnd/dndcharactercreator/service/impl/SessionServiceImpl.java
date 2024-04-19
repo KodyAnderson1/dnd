@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -61,13 +62,17 @@ public class SessionServiceImpl implements SessionService {
   }
 
   @Override
-  public ExpandedDnDCharacter getCharacter(String sessionGuid, String userGuid) {
+  public Optional<ExpandedDnDCharacter> getCharacter(String sessionGuid, String userGuid) {
 
-    // TODO: Add Error Handling
     SessionCharacter character = sessionCharacterRepository.findBySessionGuidAndUserGuid(sessionGuid, userGuid);
+
+    if (character == null || character.getId() == null) {
+      return Optional.empty();
+    }
+
     SessionCharacterAttributes attributes = sessionCharacterAttributesRepository.findByUserSessionCharacterFk(character.getId());
 
-    return new ExpandedDnDCharacter(character, attributes);
+    return Optional.of(new ExpandedDnDCharacter(character, attributes));
   }
 
   @Override

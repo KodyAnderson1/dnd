@@ -1,7 +1,7 @@
 package com.dnd.dndcharactercreator.controller;
 
 import com.dnd.dndcharactercreator.exception.DnDException;
-import com.dnd.dndcharactercreator.model.ActiveSession;
+import com.dnd.dndcharactercreator.model.session.ActiveSession;
 import com.dnd.dndcharactercreator.model.Error;
 import com.dnd.dndcharactercreator.model.entities.DnDCharacter;
 import com.dnd.dndcharactercreator.model.entities.DnDUser;
@@ -10,6 +10,7 @@ import com.dnd.dndcharactercreator.service.CharacterService;
 import com.dnd.dndcharactercreator.service.ActiveSessionManager;
 import com.dnd.dndcharactercreator.service.PoorManCache;
 import com.dnd.dndcharactercreator.service.UserService;
+import com.dnd.dndcharactercreator.utils.LoggingUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -108,8 +109,8 @@ public class CharacterController {
     CharacterForm characterForm = new CharacterForm(dnDCharacter);
 
     model.addAttribute("character", characterForm);
-    model.addAttribute("classes", characterService.getAllClasses());
-    model.addAttribute("races", characterService.getAllRaces());
+    model.addAttribute("classes", cacheService.getAllClasses());
+    model.addAttribute("races", cacheService.getAllRaces());
     return "update-character";
   }
 

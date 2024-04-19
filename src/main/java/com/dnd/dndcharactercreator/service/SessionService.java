@@ -4,6 +4,7 @@ import com.dnd.dndcharactercreator.model.ExpandedDnDCharacter;
 import com.dnd.dndcharactercreator.model.entities.DnDSession;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SessionService {
 
@@ -21,7 +22,7 @@ public interface SessionService {
 
   void deleteSession(String sessionGuid);
 
-  ExpandedDnDCharacter getCharacter(String sessionGuid, String userGuid);
+  Optional<ExpandedDnDCharacter> getCharacter(String sessionGuid, String userGuid);
 
   void saveCharacter(String sessionGuid, ExpandedDnDCharacter character);
 

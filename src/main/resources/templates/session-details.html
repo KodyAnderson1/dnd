@@ -113,8 +113,9 @@
         });
 
         // Subscribe to receive active user updates
-        stompClient.subscribe(`/topic/activeUsers/${sessionId}`, function (activeUsersOutput) {
+        stompClient.subscribe(`/topic/activeUsers/${sessionId}`,  (activeUsersOutput) => {
             const activeUsers = JSON.parse(activeUsersOutput.body);
+            console.log(activeUsers);
             updateActiveUsers(activeUsers);
         });
     });

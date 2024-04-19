@@ -36,13 +36,17 @@ public class WebSocketController {
     log.info("Private Message Received");
     sessionService.addChatMessage(sessionId, chatMessage);
 
+    // TODO: There has to be a better way to do this.
     String destination = String.format("/topic/messages/%s/%s", sessionId, chatMessage.getRecipient());
     messagingTemplate.convertAndSend(destination, chatMessage);
+
+    String authorDestination = String.format("/topic/messages/%s/%s", sessionId, chatMessage.getAuthor().getId());
+    messagingTemplate.convertAndSend(authorDestination, chatMessage);
   }
 
-  @GetMapping("/chat/{sessionId}/activeUsers")
-  public List<DnDUser> getActiveUsers(@PathVariable String sessionId) {
-    return sessionService.getActiveUsers(sessionId);
-  }
+  //  @GetMapping("/chat/{sessionId}/activeUsers")
+  //  public List<DnDUser> getActiveUsers(@PathVariable String sessionId) {
+  //    return sessionService.getActiveUsers(sessionId);
+  //  }
 
 }

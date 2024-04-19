@@ -2,16 +2,19 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<form th:fragment="form" th:object="${character}" th:action="${character.id != null ? '/characters/' + character.id : '/characters'}" method="post">
+<form th:fragment="form" th:object="${character}"
+      th:action="${character.id != null ? '/characters/' + character.id : '/characters'}" method="post">
     <div class="space-y-4">
         <div class="space-y-1">
             <label for="name" class="block text-sm font-medium">Character Name</label>
-            <input type="text" id="name" th:field="*{name}" placeholder="Enter character's name" class="mt-1 block w-full py-2 px-3 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <input type="text" id="name" th:field="*{name}" placeholder="Enter character's name"
+                   class="mt-1 block w-full py-2 px-3 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
         </div>
 
         <div class="space-y-1">
             <label for="race" class="block text-sm font-medium">Race</label>
-            <select id="race" th:field="*{race}" class="mt-1 block w-full py-2 px-3 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <select id="race" th:field="*{race}"
+                    class="mt-1 block w-full py-2 px-3 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 <option value="">Select Race</option>
                 <option th:each="race : ${races}" th:value="${race.name}" th:text="${race.name}"></option>
             </select>
@@ -19,18 +22,85 @@
 
         <div class="space-y-1">
             <label for="characterClass" class="block text-sm font-medium">Class</label>
-            <select id="characterClass" th:field="*{characterClass}" class="mt-1 block w-full py-2 px-3 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <select id="characterClass" th:field="*{characterClass}"
+                    class="mt-1 block w-full py-2 px-3 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 <option value="">Select Class</option>
                 <option th:each="cls : ${classes}" th:value="${cls.name}" th:text="${cls.name}"></option>
             </select>
         </div>
 
-<!--        <div class="space-y-1">-->
-<!--            <label for="level" class="block text-sm font-medium">Level</label>-->
-<!--            <input type="number" id="level" th:field="*{level}" placeholder="Enter character's level" class="mt-1 block w-full py-2 px-3 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">-->
-<!--        </div>-->
+        <div class="container mx-auto px-4 space-y-2">
+            <h3 class="text-xl font-bold my-4">Character Stats</h3>
 
-        <button type="submit" th:text="${character.id != null ? 'Update Character' : 'Save Character'}" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <div class="flex justify-between">
+                <label for="strength" class="flex items-center">Strength</label>
+                <div class="flex items-center justify-center">
+                    <button type="button" onclick="decrement('strength')" class="px-3 py-1 bg-red-500 text-white font-bold rounded hover:bg-red-700">-</button>
+                    <input type="text" id="strength" th:field="*{strength}" class="w-24 text-center px-5 py-2 mx-2 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <button type="button" onclick="increment('strength')" class="px-3 py-1 bg-green-500 text-white font-bold rounded hover:bg-green-700">+</button>
+                </div>
+            </div>
+
+            <div class="flex justify-between">
+                <label for="initiative" class="flex items-center">Initiative</label>
+                <div class="flex items-center justify-center">
+                    <button type="button" onclick="decrement('initiative')" class="px-3 py-1 bg-red-500 text-white font-bold rounded hover:bg-red-700">-</button>
+                    <input type="text" id="initiative" th:field="*{initiative}" class="w-24 text-center px-5 py-2 mx-2 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <button type="button" onclick="increment('initiative')" class="px-3 py-1 bg-green-500 text-white font-bold rounded hover:bg-green-700">+</button>
+                </div>
+            </div>
+
+            <div class="flex justify-between">
+                <label for="dexterity" class="flex items-center">Dexterity</label>
+                <div class="flex items-center justify-center">
+                    <button type="button" onclick="decrement('dexterity')" class="px-3 py-1 bg-red-500 text-white font-bold rounded hover:bg-red-700">-</button>
+                    <input type="text" id="dexterity" th:field="*{dexterity}" class="w-24 text-center px-5 py-2 mx-2 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <button type="button" onclick="increment('dexterity')" class="px-3 py-1 bg-green-500 text-white font-bold rounded hover:bg-green-700">+</button>
+                </div>
+            </div>
+
+            <div class="flex justify-between">
+                <label for="constitution" class="flex items-center">Constitution</label>
+                <div class="flex items-center justify-center">
+                    <button type="button" onclick="decrement('constitution')" class="px-3 py-1 bg-red-500 text-white font-bold rounded hover:bg-red-700">-</button>
+                    <input type="text" id="constitution" th:field="*{constitution}" class="w-24 text-center px-5 py-2 mx-2 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <button type="button" onclick="increment('constitution')" class="px-3 py-1 bg-green-500 text-white font-bold rounded hover:bg-green-700">+</button>
+                </div>
+            </div>
+
+            <div class="flex justify-between">
+                <label for="intelligence" class="flex items-center">Intelligence</label>
+                <div class="flex items-center justify-center">
+                    <button type="button" onclick="decrement('intelligence')" class="px-3 py-1 bg-red-500 text-white font-bold rounded hover:bg-red-700">-</button>
+                    <input type="text" id="intelligence" th:field="*{intelligence}" class="w-24 text-center px-5 py-2 mx-2 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <button type="button" onclick="increment('intelligence')" class="px-3 py-1 bg-green-500 text-white font-bold rounded hover:bg-green-700">+</button>
+                </div>
+            </div>
+
+            <div class="flex justify-between">
+                <label for="wisdom" class="flex items-center">Wisdom</label>
+                <div class="flex items-center justify-center">
+                    <button type="button" onclick="decrement('wisdom')" class="px-3 py-1 bg-red-500 text-white font-bold rounded hover:bg-red-700">-</button>
+                    <input type="text" id="wisdom" th:field="*{wisdom}" class="w-24 text-center px-5 py-2 mx-2 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <button type="button" onclick="increment('wisdom')" class="px-3 py-1 bg-green-500 text-white font-bold rounded hover:bg-green-700">+</button>
+                </div>
+            </div>
+
+
+            <div class="flex justify-between">
+                <label for="charisma" class="flex items-center">Charisma</label>
+                <div class="flex items-center justify-center">
+                    <button type="button" onclick="decrement('charisma')" class="px-3 py-1 bg-red-500 text-white font-bold rounded hover:bg-red-700">-</button>
+                    <input type="text" id="charisma" th:field="*{charisma}" class="w-24 text-center px-5 py-2 mx-2 border border-gray-700 bg-gray-700 text-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <button type="button" onclick="increment('charisma')" class="px-3 py-1 bg-green-500 text-white font-bold rounded hover:bg-green-700">+</button>
+                </div>
+            </div>
+
+            </div>
+        </div>
+
+        <button type="submit" th:text="${character.id != null ? 'Update Character' : 'Save Character'}"
+                class="w-full flex justify-center py-2 px-4 mt-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             Save Character
         </button>
     </div>

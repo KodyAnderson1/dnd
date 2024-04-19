@@ -7,7 +7,7 @@ import java.util.List;
 public interface UserService {
   void saveUser(String username, String password);
 
-  void saveManyUsers(List<DnDUser> users);
+  void saveUser(DnDUser user);
 
   DnDUser getById(Long id);
 

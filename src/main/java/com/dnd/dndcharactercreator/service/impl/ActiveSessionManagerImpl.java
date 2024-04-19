@@ -2,13 +2,16 @@ package com.dnd.dndcharactercreator.service.impl;
 
 import com.dnd.dndcharactercreator.exception.NotAuthorizedException;
 import com.dnd.dndcharactercreator.exception.SessionNotFoundException;
-import com.dnd.dndcharactercreator.model.ActiveSession;
+import com.dnd.dndcharactercreator.model.entities.SessionCharacter;
+import com.dnd.dndcharactercreator.model.entities.SessionCharacterAttributes;
+import com.dnd.dndcharactercreator.model.session.ActiveSession;
 import com.dnd.dndcharactercreator.model.ExpandedDnDCharacter;
-import com.dnd.dndcharactercreator.model.SessionParticipant;
+import com.dnd.dndcharactercreator.model.session.SessionParticipant;
 import com.dnd.dndcharactercreator.model.chat.ChatMessage;
 import com.dnd.dndcharactercreator.model.entities.DnDSession;
 import com.dnd.dndcharactercreator.model.entities.DnDUser;
 import com.dnd.dndcharactercreator.service.ActiveSessionManager;
+import com.dnd.dndcharactercreator.service.CharacterService;
 import com.dnd.dndcharactercreator.service.SessionService;
 import com.dnd.dndcharactercreator.utils.ExceptionCodes;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +33,13 @@ public class ActiveSessionManagerImpl implements ActiveSessionManager {
   // In Memory storage of sessions. Will reset on server restart
   private final ConcurrentHashMap<String, ActiveSession> sessions;
   private final SessionService sessionService;
+  private final CharacterService characterService;
 
   @Autowired
-  public ActiveSessionManagerImpl(SessionService sessionService) {
+  public ActiveSessionManagerImpl(SessionService sessionService, CharacterService characterService) {
     this.sessions = new ConcurrentHashMap<>();
     this.sessionService = sessionService;
+    this.characterService = characterService;
   }
 
   @Override
@@ -56,7 +61,7 @@ public class ActiveSessionManagerImpl implements ActiveSessionManager {
             .name(session.getName())
             .description(session.getDescription())
             .dungeonMasterGuid(session.getDungeonMasterGuid())
-            .inviteCode(UUID.randomUUID().toString())
+            .inviteCode(session.getInviteCode())
             .build();
 
     return sessions.putIfAbsent(activeSession.getSessionId(), activeSession);
@@ -76,7 +81,10 @@ public class ActiveSessionManagerImpl implements ActiveSessionManager {
       throw new SessionNotFoundException("User {} tried to join a non-existent session. Id {}", ExceptionCodes.AE102);
     }
 
-    ExpandedDnDCharacter character = sessionService.getCharacter(sessionId, user.getGuid());
+    ExpandedDnDCharacter character = sessionService.getCharacter(sessionId, user.getGuid()).orElseThrow(() -> {
+      log.warn("User {} tried to join a session they have no character for. Session Id {}", user.getGuid(), sessionId);
+      return new NotAuthorizedException("User " + user.getGuid() + " tried to join a session they have no character for. Id " + sessionId, ExceptionCodes.AE103);
+    });
 
     log.info("Attempting to add participant " + user.getId() + " to session " + sessionId);
     session.addParticipant(user, stompId, character.character(), character.attributes());
@@ -91,12 +99,28 @@ public class ActiveSessionManagerImpl implements ActiveSessionManager {
 
   @Override
   public ChatMessage addChatMessage(String sessionId, ChatMessage message) {
-    return sessions.get(sessionId).getChatSession().addMessage(message);
+    ActiveSession session = sessions.get(sessionId);
+
+    if (session == null) {
+      log.warn("Session {} not found", sessionId);
+      throw new SessionNotFoundException("Session {} not found", ExceptionCodes.AE102);
+    }
+
+    return session.getChatSession().addMessage(message);
   }
 
   @Override
   public List<DnDUser> getActiveUsers(String sessionId) {
-    return sessions.get(sessionId).getActiveParticipants().stream().map(SessionParticipant::getUser).toList();
+    ActiveSession session = sessions.get(sessionId);
+
+    if (session == null) {
+      log.warn("Session {} not found", sessionId);
+      throw new SessionNotFoundException("Session {} not found", ExceptionCodes.AE102);
+    }
+
+    return session.getActiveParticipants().stream()
+            .map(SessionParticipant::getUser)
+            .toList();
   }
 
   private String getUserGuid() {

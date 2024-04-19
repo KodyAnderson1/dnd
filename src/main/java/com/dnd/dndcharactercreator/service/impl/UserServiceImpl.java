@@ -22,14 +22,13 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void saveUser(String username, String password) {
-    DnDUser user = userRepository.save(new DnDUser(username, passwordEncoder.encode(password)));
-    log.info("User saved: {}", user);
+    userRepository.save(new DnDUser(username, passwordEncoder.encode(password)));
   }
 
   @Override
-  public void saveManyUsers(List<DnDUser> users) {
-    users.forEach(user -> user.setPassword(passwordEncoder.encode(user.getPassword())));
-    userRepository.saveAll(users);
+  public void saveUser(DnDUser user) {
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    userRepository.save(user);
   }
 
   @Override

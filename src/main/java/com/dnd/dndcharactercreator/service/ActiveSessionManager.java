@@ -1,6 +1,6 @@
 package com.dnd.dndcharactercreator.service;
 
-import com.dnd.dndcharactercreator.model.ActiveSession;
+import com.dnd.dndcharactercreator.model.session.ActiveSession;
 import com.dnd.dndcharactercreator.model.chat.ChatMessage;
 import com.dnd.dndcharactercreator.model.entities.DnDUser;
 

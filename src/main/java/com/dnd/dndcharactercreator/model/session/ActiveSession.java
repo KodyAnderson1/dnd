@@ -1,4 +1,4 @@
-package com.dnd.dndcharactercreator.model;
+package com.dnd.dndcharactercreator.model.session;
 
 import com.dnd.dndcharactercreator.model.chat.ChatSession;
 import com.dnd.dndcharactercreator.model.entities.DnDUser;
