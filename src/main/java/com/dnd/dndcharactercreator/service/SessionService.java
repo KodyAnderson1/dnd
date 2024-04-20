@@ -2,6 +2,7 @@ package com.dnd.dndcharactercreator.service;
 
 import com.dnd.dndcharactercreator.model.ExpandedDnDCharacter;
 import com.dnd.dndcharactercreator.model.entities.DnDSession;
+import com.dnd.dndcharactercreator.model.entities.DnDUserSession;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,12 +21,16 @@ public interface SessionService {
 
   void saveSession(DnDSession session);
 
-  void deleteSession(String sessionGuid);
+  void createSession(DnDSession session, Long characterId, Long attributesId);
+
+  void addUserToSession(String sessionGuid, ExpandedDnDCharacter character);
 
   Optional<ExpandedDnDCharacter> getCharacter(String sessionGuid, String userGuid);
 
-  void saveCharacter(String sessionGuid, ExpandedDnDCharacter character);
+  List<DnDUserSession> getSessionsByUserGuid(String userGuid);
 
-  void deleteCharacter(String sessionGuid, String userGuid);
+  List<DnDUserSession> getUserSessionsBySessionGuid(String sessionGuid);
+
+  DnDUserSession getUserSession(String userGuid, String sessionGuid);
 
 }

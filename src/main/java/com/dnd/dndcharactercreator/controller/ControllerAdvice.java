@@ -4,16 +4,23 @@ import com.dnd.dndcharactercreator.exception.DnDException;
 import com.dnd.dndcharactercreator.model.Error;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.function.Predicate;
+
 @Slf4j
-@ControllerAdvice
-public class AdviceController {
+@org.springframework.web.bind.annotation.ControllerAdvice
+public class ControllerAdvice {
+
+  private static final Predicate<String> NULL_BLANK = s -> s == null || s.isBlank();
 
   @ExceptionHandler(DnDException.class)
   public String handleDnDException(DnDException e, Model model) {
-    model.addAttribute("error", new Error(e.getTitleMessage(), e.getCode(), e.getDisplayMessage()));
+    String titleMessage = NULL_BLANK.test(e.getTitleMessage()) ? "Uh oh!" : e.getTitleMessage();
+    String code = NULL_BLANK.test(e.getCode()) ? "AE003" : e.getCode();
+    String displayMessage = NULL_BLANK.test(e.getDisplayMessage()) ? "Something bad happened and we couldn't recover. Try again later" : e.getDisplayMessage();
+
+    model.addAttribute("error", new Error(titleMessage, code, displayMessage));
 
     log.error("Unhandled DnDException occurred, Message: {}", e.getMessage(), e);
     return "error";

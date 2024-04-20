@@ -65,6 +65,19 @@ CREATE TABLE IF NOT EXISTS dnd_sessions
     created             TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS user_sessions
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_guid   VARCHAR(255),
+    session_guid VARCHAR(255),
+    character_guid BIGINT,
+    attributes_guid BIGINT,
+    is_dungeon_master BOOLEAN,
+    created     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE (user_guid, session_guid)
+);
+
 CREATE TABLE IF NOT EXISTS user_session_characters
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,

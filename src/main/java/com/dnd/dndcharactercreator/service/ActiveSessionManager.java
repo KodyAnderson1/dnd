@@ -12,7 +12,9 @@ public interface ActiveSessionManager {
 
   List<ActiveSession> getAllSessions();
 
-  ActiveSession joinSession(String sessionId, DnDUser user, String stompId);
+  List<ActiveSession> getSessionsBySessionGuids(List<String> sessionGuids);
+
+  void joinSession(String sessionId, DnDUser user, String stompId);
 
   ActiveSession getSession(String sessionId);
 

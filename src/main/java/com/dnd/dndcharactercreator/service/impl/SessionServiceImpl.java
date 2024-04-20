@@ -2,14 +2,19 @@ package com.dnd.dndcharactercreator.service.impl;
 
 import com.dnd.dndcharactercreator.model.ExpandedDnDCharacter;
 import com.dnd.dndcharactercreator.model.entities.DnDSession;
+import com.dnd.dndcharactercreator.model.entities.DnDUser;
+import com.dnd.dndcharactercreator.model.entities.DnDUserSession;
 import com.dnd.dndcharactercreator.model.entities.SessionCharacter;
 import com.dnd.dndcharactercreator.model.entities.SessionCharacterAttributes;
 import com.dnd.dndcharactercreator.repository.SessionCharacterAttributesRepository;
 import com.dnd.dndcharactercreator.repository.SessionCharacterRepository;
 import com.dnd.dndcharactercreator.repository.SessionRepository;
+import com.dnd.dndcharactercreator.repository.UserSessionsRepository;
 import com.dnd.dndcharactercreator.service.SessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +26,9 @@ import java.util.Optional;
 public class SessionServiceImpl implements SessionService {
 
   private final SessionRepository sessionRepository;
-  private final SessionCharacterAttributesRepository sessionCharacterAttributesRepository;
+  private final UserSessionsRepository userSessionsRepository;
   private final SessionCharacterRepository sessionCharacterRepository;
+  private final SessionCharacterAttributesRepository sessionCharacterAttributesRepository;
 
   @Override
   public List<DnDSession> getAllSessions() {
@@ -31,7 +37,7 @@ public class SessionServiceImpl implements SessionService {
 
   @Override
   public int getTotalMembers(String sessionGuid) {
-    return sessionCharacterRepository.countBySessionGuid(sessionGuid);
+    return userSessionsRepository.countBySessionGuid(sessionGuid);
   }
 
   @Override
@@ -57,8 +63,35 @@ public class SessionServiceImpl implements SessionService {
   }
 
   @Override
-  public void deleteSession(String sessionGuid) {
-    sessionRepository.deleteByGuid(sessionGuid);
+  public void createSession(DnDSession session, Long characterId, Long attributesId) {
+    DnDSession createdSession = sessionRepository.save(session);
+
+    DnDUserSession userSession = DnDUserSession.builder()
+            .sessionGuid(createdSession.getGuid())
+            .characterId(characterId)
+            .attributesId(attributesId)
+            .userGuid(getCurrentUser().getGuid())
+            .isDungeonMaster(true) // If the user is creating the session, they are the DM
+            .build();
+
+    userSessionsRepository.save(userSession);
+  }
+
+  @Override
+  public void addUserToSession(String sessionGuid, ExpandedDnDCharacter character) {
+
+    var savedCharacter = sessionCharacterRepository.save(character.character());
+    var savedAttributes = sessionCharacterAttributesRepository.save(character.attributes());
+
+    DnDUserSession userSession = DnDUserSession.builder()
+            .sessionGuid(sessionGuid)
+            .characterId(savedCharacter.getId())
+            .attributesId(savedAttributes.getId())
+            .userGuid(getCurrentUser().getGuid())
+            .isDungeonMaster(false)
+            .build();
+
+    userSessionsRepository.save(userSession);
   }
 
   @Override
@@ -76,15 +109,22 @@ public class SessionServiceImpl implements SessionService {
   }
 
   @Override
-  public void saveCharacter(String sessionGuid, ExpandedDnDCharacter character) {
-
-    // TODO: Add Error Handling
-    sessionCharacterRepository.save(character.character());
-    sessionCharacterAttributesRepository.save(character.attributes());
+  public List<DnDUserSession> getSessionsByUserGuid(String userGuid) {
+    return userSessionsRepository.findAllByUserGuid(userGuid);
   }
 
   @Override
-  public void deleteCharacter(String sessionGuid, String userGuid) {
+  public List<DnDUserSession> getUserSessionsBySessionGuid(String sessionGuid) {
+    return userSessionsRepository.findAllBySessionGuid(sessionGuid);
+  }
 
+  @Override
+  public DnDUserSession getUserSession(String userGuid, String sessionGuid) {
+    return userSessionsRepository.findByUserGuidAndSessionGuid(userGuid, sessionGuid);
+  }
+
+  public DnDUser getCurrentUser() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return (DnDUser) authentication.getPrincipal();
   }
 }

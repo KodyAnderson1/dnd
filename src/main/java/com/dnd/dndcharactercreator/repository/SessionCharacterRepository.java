@@ -9,12 +9,6 @@ import java.util.List;
 @Repository
 public interface SessionCharacterRepository extends JpaRepository<SessionCharacter, Long> {
 
-  List<SessionCharacter> findAllBySessionGuid(String sessionGuid);
-
-  int countBySessionGuid(String sessionGuid);
-
-  List<SessionCharacter> findAllBySessionGuidIn(List<String> sessionGuid);
-
   SessionCharacter findBySessionGuidAndUserGuid(String characterGuid, String userGuid);
 
 }

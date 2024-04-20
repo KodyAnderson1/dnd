@@ -2,8 +2,6 @@ package com.dnd.dndcharactercreator.service.impl;
 
 import com.dnd.dndcharactercreator.exception.NotAuthorizedException;
 import com.dnd.dndcharactercreator.exception.SessionNotFoundException;
-import com.dnd.dndcharactercreator.model.entities.SessionCharacter;
-import com.dnd.dndcharactercreator.model.entities.SessionCharacterAttributes;
 import com.dnd.dndcharactercreator.model.session.ActiveSession;
 import com.dnd.dndcharactercreator.model.ExpandedDnDCharacter;
 import com.dnd.dndcharactercreator.model.session.SessionParticipant;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -73,7 +70,14 @@ public class ActiveSessionManagerImpl implements ActiveSessionManager {
   }
 
   @Override
-  public ActiveSession joinSession(String sessionId, DnDUser user, String stompId) {
+  public List<ActiveSession> getSessionsBySessionGuids(List<String> sessionGuids) {
+    return sessions.values().stream()
+            .filter(session -> sessionGuids.contains(session.getSessionId()))
+            .toList();
+  }
+
+  @Override
+  public void joinSession(String sessionId, DnDUser user, String stompId) {
     ActiveSession session = sessions.get(sessionId);
 
     if (session == null) {
@@ -89,7 +93,6 @@ public class ActiveSessionManagerImpl implements ActiveSessionManager {
     log.info("Attempting to add participant " + user.getId() + " to session " + sessionId);
     session.addParticipant(user, stompId, character.character(), character.attributes());
 
-    return session;
   }
 
   @Override
